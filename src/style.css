@@ -491,3 +491,30 @@ h1 {
     width: 100%;
   }
 }
+
+/* スマホでは選択中ローテだけ表示 */
+@media (max-width: 720px) {
+  .rotation-card {
+    display: none;
+  }
+
+  .rotation-card.active {
+    display: block;
+  }
+
+  .rotation-card.special {
+    grid-column: auto;
+  }
+
+  .rotation-list-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .list-header h3::after {
+    content: "（選択中のみ）";
+    margin-left: 6px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}

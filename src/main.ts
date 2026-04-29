@@ -364,44 +364,6 @@ const loadSelectedMonster = async () => {
   }
 }
 
-const loadSelectedMonster = async () => {
-  if (!manifest) {
-    renderError('manifest が読み込まれていません')
-    return
-  }
-
-  const selectedManifestMonster = manifest.monsters[selectedManifestMonsterIndex]
-
-  if (!selectedManifestMonster) {
-    renderError('選択されたボスが見つかりません')
-    return
-  }
-
-  try {
-    const response = await fetch(`${import.meta.env.BASE_URL}${selectedManifestMonster.path}`)
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const data = (await response.json()) as RotationData
-
-    if (!data.monsters || data.monsters.length === 0) {
-      throw new Error('monsters が空です')
-    }
-
-    rotationData = data
-    selectedMonsterIndex = 0
-    selectedPhaseIndex = 0
-    selectedPatternIndex = 0
-
-    renderApp()
-  } catch (error) {
-    const message = error instanceof Error ? error.message : '不明なエラー'
-    renderError(message)
-  }
-}
-
 const loadRotationData = async () => {
   renderLoading()
 
