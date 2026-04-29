@@ -46,6 +46,12 @@ if (!app) {
   throw new Error('#app が見つかりません')
 }
 
+const isTauri = '__TAURI_INTERNALS__' in window
+
+if (isTauri) {
+  document.body.classList.add('overlay')
+}
+
 let manifest: Manifest | null = null
 let rotationData: RotationData | null = null
 let selectedManifestMonsterIndex = 0
@@ -230,20 +236,6 @@ const renderApp = () => {
           </label>
         </div>
 
-        <section class="control-section">
-          <h3>HP段階</h3>
-          <div class="tabs phase-tabs">
-            ${phaseTabsHtml}
-          </div>
-        </section>
-
-        <section class="control-section">
-          <h3>ローテ / モード</h3>
-          <div class="tabs pattern-tabs">
-            ${patternTabsHtml}
-          </div>
-        </section>
-
         <section class="list-panel">
           <div class="list-header">
             <p class="current-phase">${escapeHtml(phase.name)}</p>
@@ -257,6 +249,23 @@ const renderApp = () => {
             ${rotationCardsHtml}
           </div>
         </section>
+
+        <div class="controls-block">
+          <section class="control-section">
+            <h3>HP段階</h3>
+            <div class="tabs phase-tabs">
+              ${phaseTabsHtml}
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>ローテ / モード</h3>
+            <div class="tabs pattern-tabs">
+              ${patternTabsHtml}
+            </div>
+          </section>
+        </div>
+
       </section>
     </main>
   `

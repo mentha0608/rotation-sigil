@@ -530,3 +530,278 @@ h1 {
   }
 
 }
+
+@media (min-width: 721px) {
+  .app {
+    padding: 8px 0;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .monster-header {
+    margin-bottom: 8px;
+  }
+
+  .version {
+    margin-top: 2px;
+  }
+
+  .list-panel {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  .rotation-card {
+    padding: 10px;
+  }
+
+  .rotation-card-header {
+    margin-bottom: 8px;
+  }
+
+  .action-list.compact {
+    gap: 5px;
+  }
+
+  .action-list.compact li {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .controls-block {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  .control-section {
+    margin-top: 8px;
+  }
+}
+
+.controls-block {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.controls-block .control-section:first-child {
+  margin-top: 0;
+}
+
+/* Tauriオーバーレイ用：左操作 / 右ローテ表示 */
+body.overlay {
+  background: rgba(5, 8, 22, 0.08);
+}
+
+body.overlay .app {
+  width: calc(100% - 6px);
+  padding: 4px 0;
+}
+
+body.overlay .app-header {
+  display: none;
+}
+
+body.overlay .panel {
+  display: grid;
+  grid-template-columns: 106px 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(5, 8, 22, 0.1);
+  box-shadow: none;
+}
+
+/* 左上：ボス選択 */
+body.overlay .monster-header {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  margin: 0;
+}
+
+body.overlay .monster-header h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+body.overlay .version {
+  display: none;
+}
+
+body.overlay .monster-select-label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 10px;
+}
+
+body.overlay .monster-select-label span {
+  font-size: 10px;
+}
+
+body.overlay .monster-select {
+  width: 100%;
+  min-height: 28px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+/* 左下：操作エリア */
+body.overlay .controls-block {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+
+body.overlay .control-section {
+  margin-top: 8px;
+}
+
+body.overlay .control-section:first-child {
+  margin-top: 0;
+}
+
+body.overlay .control-section h3 {
+  margin: 0 0 4px;
+  font-size: 10px;
+  color: #dbeafe;
+}
+
+/* 操作ボタンは縦積み */
+body.overlay .tabs {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+body.overlay .tab {
+  width: 100%;
+  min-height: 27px;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+body.overlay .tab.active {
+  background: rgba(37, 99, 235, 0.58);
+}
+
+body.overlay .phase-tab.phase-hp50.active {
+  background: rgba(202, 138, 4, 0.55);
+}
+
+body.overlay .phase-tab.phase-hp25.active {
+  background: rgba(190, 18, 60, 0.58);
+}
+
+body.overlay .tab-id {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 9px;
+}
+
+/* HP段階は将来HP90が増えても4枠分確保 */
+body.overlay .phase-tabs {
+  min-height: calc((27px * 4) + (4px * 3));
+}
+
+/* ローテも4枠分確保 */
+body.overlay .pattern-tabs {
+  min-height: calc((27px * 4) + (4px * 3));
+}
+
+/* 右：ローテ表示エリア */
+body.overlay .list-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid rgba(96, 165, 250, 0.32);
+  border-radius: 12px;
+  background: rgba(7, 18, 45, 0.18);
+}
+
+body.overlay .list-header {
+  margin-bottom: 6px;
+}
+
+body.overlay .current-phase {
+  margin: 0 0 2px;
+  font-size: 10px;
+}
+
+body.overlay .list-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Tauriでは選択中ローテだけ表示 */
+body.overlay .rotation-list-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+body.overlay .rotation-card {
+  display: none;
+  padding: 6px;
+  border-radius: 12px;
+  border-color: rgba(96, 165, 250, 0.38);
+  background: rgba(15, 23, 42, 0.16);
+}
+
+body.overlay .rotation-card.active {
+  display: block;
+}
+
+body.overlay .rotation-card.special {
+  grid-column: auto;
+}
+
+body.overlay .rotation-card-header {
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+body.overlay .rotation-card-header h4 {
+  font-size: 13px;
+}
+
+body.overlay .action-list.compact {
+  gap: 4px;
+}
+
+body.overlay .action-list.compact li {
+  grid-template-columns: 21px 1fr;
+  gap: 5px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.62);
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+
+body.overlay .action-index {
+  width: 19px;
+  height: 19px;
+  font-size: 9px;
+}
+
+body.overlay .action-text {
+  min-height: 19px;
+}
