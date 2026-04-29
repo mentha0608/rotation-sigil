@@ -267,6 +267,23 @@ const renderApp = () => {
   bindEvents()
 }
 
+const scrollToRotationPanel = () => {
+  if (!window.matchMedia('(max-width: 720px)').matches) {
+    return
+  }
+
+  const panel = document.querySelector<HTMLElement>('.list-panel')
+
+  if (!panel) {
+    return
+  }
+
+  panel.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+}
+
 const bindEvents = () => {
   const phaseButtons = document.querySelectorAll<HTMLButtonElement>('[data-phase-index]')
   const patternButtons = document.querySelectorAll<HTMLButtonElement>('[data-pattern-index]')
@@ -295,8 +312,10 @@ const bindEvents = () => {
         return
       }
 
-      selectedPatternIndex = patternIndex
+      selectedPhaseIndex = phaseIndex
+      selectedPatternIndex = 0
       renderApp()
+      setTimeout(scrollToRotationPanel, 0)
     })
   })
 
