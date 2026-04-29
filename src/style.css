@@ -190,14 +190,21 @@ h1 {
   color: #cbd5e1;
 }
 
+.mobile-title {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .list-header h3 {
     font-size: 0;
   }
 
-  .list-header h3::before {
-    content: "選択中ローテ";
-    font-size: 18px;
+  .desktop-title {
+    display: none;
+  }
+
+  .mobile-title {
+    display: inline;
   }
 
   .app {

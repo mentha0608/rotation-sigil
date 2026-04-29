@@ -250,7 +250,10 @@ const renderApp = () => {
         <section class="list-panel">
           <div class="list-header">
             <p class="current-phase">${escapeHtml(phase.name)}</p>
-            <h3>一覧モード</h3>
+            <h3>
+              <span class="desktop-title">一覧モード</span>
+              <span class="mobile-title">選択中ローテ</span>
+            </h3>
           </div>
 
           <div class="rotation-list-grid">
