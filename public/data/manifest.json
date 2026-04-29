@@ -1,0 +1,14 @@
+{
+  "monsters": [
+    {
+      "id": "noxeria_lv1",
+      "name": "ノクゼリア Lv1",
+      "path": "/data/monsters/noxeria_lv1.json"
+    },
+    {
+      "id": "noxeria_lv2",
+      "name": "ノクゼリア Lv2",
+      "path": "/data/monsters/noxeria_lv2.json"
+    }
+  ]
+}
