@@ -340,7 +340,7 @@ const loadSelectedMonster = async () => {
   }
 
   try {
-    const response = await fetch(selectedManifestMonster.path)
+    const response = await fetch(`${import.meta.env.BASE_URL}${selectedManifestMonster.path}`)
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -368,7 +368,7 @@ const loadRotationData = async () => {
   renderLoading()
 
   try {
-    const response = await fetch('/data/manifest.json')
+    const response = await fetch(`${import.meta.env.BASE_URL}data/manifest.json`)
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
