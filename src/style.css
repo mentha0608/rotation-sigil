@@ -191,6 +191,15 @@ h1 {
 }
 
 @media (max-width: 720px) {
+  .list-header h3 {
+    font-size: 0;
+  }
+
+  .list-header h3::before {
+    content: "選択中ローテ";
+    font-size: 18px;
+  }
+
   .app {
     width: calc(100% - 12px);
     padding: 8px 0;
@@ -510,11 +519,4 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .list-header h3::after {
-    content: "（選択中のみ）";
-    margin-left: 6px;
-    color: #94a3b8;
-    font-size: 13px;
-    font-weight: 600;
-  }
 }
