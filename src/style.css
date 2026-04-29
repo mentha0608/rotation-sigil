@@ -207,9 +207,12 @@ h1 {
     display: inline;
   }
 
+  .list-panel {
+    scroll-margin-top: 8px;
+  }
+
   .app {
-    width: calc(100% - 12px);
-    padding: 8px 0;
+    padding-bottom: 32px;
   }
 
   h1 {

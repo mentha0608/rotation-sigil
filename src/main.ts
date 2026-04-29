@@ -92,7 +92,6 @@ const renderLoading = () => {
     <main class="app">
       <header class="app-header">
         <p class="eyebrow">Rotation Sigil</p>
-        <h1>戦律標識</h1>
         <p class="subtitle">ローテ表を読み込み中...</p>
       </header>
     </main>
@@ -104,7 +103,6 @@ const renderError = (message: string) => {
     <main class="app">
       <header class="app-header">
         <p class="eyebrow">Rotation Sigil</p>
-        <h1>戦律標識</h1>
         <p class="subtitle error">読み込みに失敗しました</p>
       </header>
 
@@ -214,7 +212,6 @@ const renderApp = () => {
     <main class="app">
       <header class="app-header">
         <p class="eyebrow">Rotation Sigil</p>
-        <h1>戦律標識</h1>
         <p class="subtitle">ボスローテーション確認ツール</p>
       </header>
 
@@ -312,8 +309,7 @@ const bindEvents = () => {
         return
       }
 
-      selectedPhaseIndex = phaseIndex
-      selectedPatternIndex = 0
+      selectedPatternIndex = patternIndex
       renderApp()
       setTimeout(scrollToRotationPanel, 0)
     })
