@@ -9,6 +9,11 @@
       "id": "noxeria_lv2",
       "name": "ノクゼリア Lv2",
       "path": "data/monsters/noxeria_lv2.json"
+    },
+    {
+      "id": "ruberangis_lv3",
+      "name": "厭悪のルベランギス Lv3",
+      "path": "data/monsters/ruberangis_lv3.json"
     }
   ]
 }

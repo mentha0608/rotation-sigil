@@ -38,11 +38,21 @@ type Phase = {
   patterns: Pattern[]
 }
 
+type Action =
+  | string
+  | {
+      text: string
+      mark?: string
+    }
+
 type Pattern = {
   id: string
   name: string
-  actions: string[]
+  tag: string
+  actions: Action[]
 }
+
+
 
 // ===== 2. DOM / 実行環境 =====
 // 画面の描画先を取得する。
@@ -168,6 +178,22 @@ const highlightKeywords = (value: string, keywords: Keyword[] = []) => {
   })
 
   return result
+}
+
+const getActionText = (action: Action) => {
+  if (typeof action === 'string') {
+    return action
+  }
+
+  return action.text
+}
+
+const getActionMark = (action: Action, index: number) => {
+  if (typeof action === 'string') {
+    return String(index + 1)
+  }
+
+  return action.mark ?? String(index + 1)
 }
 
 const clampOpacity = (value: number) => {
@@ -311,16 +337,19 @@ const renderApp = () => {
       const isActive = patternIndex === selectedPatternIndex ? ' active' : ''
       const isSpecial = patternIndex >= 3 || pattern.id === 'prison' ? ' special' : ''
 
-      const actionsHtml = pattern.actions
-        .map((action, actionIndex) => {
-          return `
-            <li>
-              <span class="action-index">${actionIndex + 1}</span>
-              <span class="action-text">${highlightKeywords(action, monster.keywords)}</span>
-            </li>
-          `
-        })
-        .join('')
+  const actionsHtml = pattern.actions
+    .map((action, actionIndex) => {
+      const actionMark = getActionMark(action, actionIndex)
+      const actionText = getActionText(action)
+
+      return `
+        <li>
+          <span class="action-index">${escapeHtml(actionMark)}</span>
+          <span class="action-text">${highlightKeywords(actionText, monster.keywords)}</span>
+        </li>
+      `
+    })
+    .join('')
 
       return `
         <article class="rotation-card${isActive}${isSpecial}" data-pattern-card-index="${patternIndex}">
@@ -659,17 +688,6 @@ const bindEvents = () => {
     await loadSelectedMonster()
   })
 }
-
-// ===== 10.5. キーボード操作 =====
-// 設定パネルを Ctrl + , で開閉する。
-// Tauri overlay では設定ボタンを目立たせすぎないため、キー操作でも呼び出せるようにする。
-window.addEventListener('keydown', (event) => {
-  if (event.ctrlKey && event.key === ',') {
-    event.preventDefault()
-    isSettingsOpen = !isSettingsOpen
-    renderApp()
-  }
-})
 
 // ===== 11. データ読み込み：選択中ボス =====
 // manifest の selectedManifestMonsterIndex をもとに、対象ボスのJSONを読み込む。

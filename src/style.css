@@ -302,6 +302,18 @@ h1 {
   font-weight: 800;
 }
 
+.keyword-strong {
+  color: #fb923c;
+}
+
+.keyword-fire {
+  color: #f97316;
+}
+
+.keyword-laser {
+  color: #f472b6;
+}
+
 .keyword-curse {
   color: #c084fc;
 }
