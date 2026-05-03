@@ -76,7 +76,7 @@ const appWindow = isTauri ? getCurrentWindow() : null
 // ===== 3. アプリ情報 =====
 // 配布時に画面へ表示するアプリ本体のバージョン。
 // package.json / tauri.conf.json の version と合わせて更新する。
-const APP_VERSION = 'v0.1.1'
+const APP_VERSION = 'v0.1.2'
 
 let manifest: Manifest | null = null
 let rotationData: RotationData | null = null
@@ -87,8 +87,6 @@ let selectedPatternIndex = 0
 let isSettingsOpen = false
 let overlayOpacity = 50
 let isVoiceEnabled = false
-let isOverlayListMode = true
-let isMinimalView = true
 let isDecorated = true
 
 // ===== 4. 保存設定 localStorage =====
@@ -99,8 +97,6 @@ const STORAGE_KEYS = {
   monsterId: 'rotation-sigil:selectedMonsterId',
   overlayOpacity: 'rotation-sigil:overlayOpacity',
   voiceEnabled: 'rotation-sigil:voiceEnabled',
-  overlayListMode: 'rotation-sigil:overlayListMode',
-  minimalView: 'rotation-sigil:minimalView',
   decorated: 'rotation-sigil:decorated'
 }
 
@@ -109,26 +105,6 @@ const getSavedDecorated = () => {
 
   if (saved === null) {
     return false
-  }
-
-  return saved === 'true'
-}
-
-const getSavedMinimalView = () => {
-  const saved = localStorage.getItem(STORAGE_KEYS.minimalView)
-
-  if (saved === null) {
-    return true
-  }
-
-  return saved === 'true'
-}
-
-const getSavedOverlayListMode = () => {
-  const saved = localStorage.getItem(STORAGE_KEYS.overlayListMode)
-
-  if (saved === null) {
-    return true
   }
 
   return saved === 'true'
@@ -217,25 +193,27 @@ const clampOpacity = (value: number) => {
 
 const applyOverlayOpacity = () => {
   const value = clampOpacity(overlayOpacity)
+  const ratio = value / 100
 
-  const shellBg = 0.02 + value * 0.0012
-  const panelBg = 0.08 + value * 0.002
-  const cardBg = 0.1 + value * 0.002
-  const rowBg = 0.38 + value * 0.004
+  const shellBg = 0.01 + ratio * 0.17
+  const panelBg = 0.04 + ratio * 0.46
+  const cardBg = 0.08 + ratio * 0.52
+  const rowBg = 0.16 + ratio * 0.68
+
+  const titlebarBg = 0.08 + ratio * 0.42
+  const controlBg = 0.16 + ratio * 0.60
+  const controlActiveBg = 0.32 + ratio * 0.48
+  const controlHoverBg = 0.42 + ratio * 0.42
 
   document.body.style.setProperty('--overlay-shell-bg', shellBg.toFixed(2))
   document.body.style.setProperty('--overlay-panel-bg', panelBg.toFixed(2))
   document.body.style.setProperty('--overlay-card-bg', cardBg.toFixed(2))
   document.body.style.setProperty('--overlay-row-bg', rowBg.toFixed(2))
-}
 
-const applyOverlayViewMode = () => {
-  document.body.classList.toggle('overlay-view-list', isOverlayListMode)
-  document.body.classList.toggle('overlay-view-current', !isOverlayListMode)
-}
-
-const applyMinimalView = () => {
-  document.body.classList.toggle('minimal-view', isMinimalView)
+  document.body.style.setProperty('--overlay-titlebar-bg', titlebarBg.toFixed(2))
+  document.body.style.setProperty('--overlay-control-bg', controlBg.toFixed(2))
+  document.body.style.setProperty('--overlay-control-active-bg', controlActiveBg.toFixed(2))
+  document.body.style.setProperty('--overlay-control-hover-bg', controlHoverBg.toFixed(2))
 }
 
 const applyDecorations = async () => {
@@ -405,24 +383,6 @@ const settingsPanelHtml = isSettingsOpen
             value="${overlayOpacity}"
             data-opacity-slider
           >
-      </label>
-
-      <label class="settings-check">
-        <input
-          type="checkbox"
-          ${isOverlayListMode ? 'checked' : ''}
-          data-overlay-list-mode-toggle
-        >
-        <span>一覧モードで表示</span>
-      </label>
-
-      <label class="settings-check">
-        <input
-          type="checkbox"
-          ${isMinimalView ? 'checked' : ''}
-          data-minimal-view-toggle
-        >
-        <span>ミニマル表示（操作ボタンを隠す）</span>
       </label>
 
       <label class="settings-check">
@@ -646,8 +606,6 @@ const bindEvents = () => {
   const settingsCloseButton = document.querySelector<HTMLButtonElement>('[data-settings-close]')
   const opacitySlider = document.querySelector<HTMLInputElement>('[data-opacity-slider]')
   const voiceToggle = document.querySelector<HTMLInputElement>('[data-voice-toggle]')
-  const overlayListModeToggle = document.querySelector<HTMLInputElement>('[data-overlay-list-mode-toggle]')
-  const minimalViewToggle = document.querySelector<HTMLInputElement>('[data-minimal-view-toggle]')
   const decorationsToggle = document.querySelector<HTMLInputElement>('[data-decorations-toggle]')
   const windowMinimizeButton = document.querySelector<HTMLButtonElement>('[data-window-minimize]')
   const windowCloseButton = document.querySelector<HTMLButtonElement>('[data-window-close]')
@@ -664,18 +622,6 @@ const bindEvents = () => {
     isDecorated = decorationsToggle.checked
     localStorage.setItem(STORAGE_KEYS.decorated, String(isDecorated))
     await applyDecorations()
-  })
-
-  minimalViewToggle?.addEventListener('change', () => {
-    isMinimalView = minimalViewToggle.checked
-    localStorage.setItem(STORAGE_KEYS.minimalView, String(isMinimalView))
-    applyMinimalView()
-  })
-
-  overlayListModeToggle?.addEventListener('change', () => {
-    isOverlayListMode = overlayListModeToggle.checked
-    localStorage.setItem(STORAGE_KEYS.overlayListMode, String(isOverlayListMode))
-    applyOverlayViewMode()
   })
 
   opacitySlider?.addEventListener('input', () => {
@@ -831,12 +777,8 @@ const loadRotationData = async () => {
 
 overlayOpacity = getSavedOverlayOpacity()
 isVoiceEnabled = getSavedVoiceEnabled()
-isOverlayListMode = getSavedOverlayListMode()
-isMinimalView = getSavedMinimalView()
 isDecorated = getSavedDecorated()
 
 applyOverlayOpacity()
-applyOverlayViewMode()
-applyMinimalView()
 applyDecorations()
 loadRotationData()
