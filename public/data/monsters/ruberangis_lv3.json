@@ -3,32 +3,27 @@
   "monsters": [
     {
       "id": "ruberangis_lv3",
-      "name": "厭悪のルベランギス",
+      "name": "ルベランギス",
       "level": "Lv3",
       "keywords": [
-        { "text": "ツインクロー", "style": "strong" },
-        { "text": "煉獄火炎", "style": "fire" },
+
         { "text": "クリムゾンペナルティ", "style": "laser" },
         { "text": "咎人の邪岩", "style": "earth" },
         { "text": "邪岩", "style": "earth" },
-        { "text": "ダークネスブレス", "style": "curse" },
-        { "text": "分散する災禍", "style": "water" },
-        { "text": "おぞましいおたけび", "style": "curse" },
         { "text": "円獄殺", "style": "prison" },
-        { "text": "四方閃", "style": "laser" },
+        { "text": "四方閃", "style": "thunder" },
         { "text": "神速メラガイアー", "style": "magic" },
         { "text": "いてつく雷鳴", "style": "ice" },
-        { "text": "八門崩絶", "style": "laser" },
-        { "text": "ディザスターブレス", "style": "earth" },
+        { "text": "八門崩絶", "style": "water" },
         { "text": "厭悪の叫び", "style": "scream" }
       ],
       "phases": [
         {
           "id": "hp100_90",
-          "name": "HP100〜90%",
+          "name": "HP100%〜",
           "patterns": [
             {
-              "id": "90%まで",
+              "id": "~90%",
               "name": "ランダム行動",
               "actions": [
                 { "mark": "・", "text": "通常攻撃" },
@@ -52,7 +47,7 @@
         },
         {
           "id": "hp90_75",
-          "name": "HP90〜75%",
+          "name": "HP90%〜",
           "patterns": [
             {
               "id": "A",
@@ -69,7 +64,7 @@
             },
             {
               "id": "B",
-              "name": "クリペナ分散",
+              "name": "通常クリペナ分散",
               "actions": [
                 { "mark": "・", "text": "通常攻撃" },
                 { "mark": "・", "text": "煉獄火炎" },
@@ -104,7 +99,7 @@
         },
         {
           "id": "hp75_50",
-          "name": "HP75〜50%",
+          "name": "HP75%〜",
           "patterns": [
             {
               "id": "A",
@@ -121,7 +116,7 @@
             },
             {
               "id": "B",
-              "name": "クリペナ分散",
+              "name": "通常クリペナ分散",
               "actions": [
                 { "mark": "・", "text": "通常攻撃" },
                 { "mark": "・", "text": "分散する災禍" },
@@ -156,7 +151,7 @@
         },
         {
           "id": "hp50_25",
-          "name": "HP50〜25%",
+          "name": "HP50%〜",
           "patterns": [
             {
               "id": "A",
@@ -184,7 +179,7 @@
             },
             {
               "id": "C",
-              "name": "ランダム叫び",
+              "name": "分散クリペナ叫び",
               "actions": [
                 { "mark": "・", "text": "ツインクロー" },
                 { "mark": "・", "text": "分散する災禍" },
@@ -207,11 +202,11 @@
         },
         {
           "id": "hp25_0",
-          "name": "HP25〜0%",
+          "name": "HP25%〜",
           "patterns": [
             {
               "id": "A",
-              "name": "ブレス八門分散ジャッジローテ",
+              "name": "息八門分散ジャッジローテ",
               "actions": [
                 "ディザスターブレス",
                 "八門崩絶",
@@ -235,7 +230,7 @@
             },
             {
               "id": "C",
-              "name": "ランダム叫び",
+              "name": "分散クリペナ叫び",
               "actions": [
                 { "mark": "・", "text": "ツインクロー" },
                 { "mark": "・", "text": "分散する災禍" },

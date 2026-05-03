@@ -15,6 +15,7 @@
         "title": "Rotation Sigil",
         "width": 636,
         "height": 520,
+        "decorations": false,
         "resizable": true,
         "fullscreen": false,
         "alwaysOnTop": true,

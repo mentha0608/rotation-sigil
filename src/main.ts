@@ -1,4 +1,5 @@
 import './style.css'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 // ===== 1. 型定義 =====
 // manifest.json / monster json の構造を定義する。
@@ -70,6 +71,8 @@ if (isTauri) {
   document.body.classList.add('overlay')
 }
 
+const appWindow = isTauri ? getCurrentWindow() : null
+
 // ===== 3. アプリ情報 =====
 // 配布時に画面へ表示するアプリ本体のバージョン。
 // package.json / tauri.conf.json の version と合わせて更新する。
@@ -86,6 +89,7 @@ let overlayOpacity = 50
 let isVoiceEnabled = false
 let isOverlayListMode = true
 let isMinimalView = true
+let isDecorated = true
 
 // ===== 4. 保存設定 localStorage =====
 // 現時点では「前回選んだボス」だけ保存する。
@@ -96,7 +100,18 @@ const STORAGE_KEYS = {
   overlayOpacity: 'rotation-sigil:overlayOpacity',
   voiceEnabled: 'rotation-sigil:voiceEnabled',
   overlayListMode: 'rotation-sigil:overlayListMode',
-  minimalView: 'rotation-sigil:minimalView'
+  minimalView: 'rotation-sigil:minimalView',
+  decorated: 'rotation-sigil:decorated'
+}
+
+const getSavedDecorated = () => {
+  const saved = localStorage.getItem(STORAGE_KEYS.decorated)
+
+  if (saved === null) {
+    return false
+  }
+
+  return saved === 'true'
 }
 
 const getSavedMinimalView = () => {
@@ -223,6 +238,20 @@ const applyMinimalView = () => {
   document.body.classList.toggle('minimal-view', isMinimalView)
 }
 
+const applyDecorations = async () => {
+  document.body.classList.toggle('decorations-off', !isDecorated)
+
+  if (!appWindow) {
+    return
+  }
+
+  try {
+    await appWindow.setDecorations(isDecorated)
+  } catch (error) {
+    console.error('標準タイトルバーの切り替えに失敗しました', error)
+  }
+}
+
 // ===== 6. 現在選択中データの取得 =====
 // selected〜Index をもとに、現在表示対象のモンスター・HP段階を取得する。
 
@@ -319,19 +348,6 @@ const renderApp = () => {
     })
     .join('')
 
-  const patternTabsHtml = phase.patterns
-    .map((patternItem, index) => {
-      const isActive = index === selectedPatternIndex ? ' active' : ''
-
-      return `
-        <button class="tab pattern-tab${isActive}" type="button" data-pattern-index="${index}">
-          <span class="tab-id">${escapeHtml(patternItem.id)}</span>
-          ${escapeHtml(patternItem.name)}
-        </button>
-      `
-    })
-    .join('')
-
   const rotationCardsHtml = phase.patterns
     .map((pattern, patternIndex) => {
       const isActive = patternIndex === selectedPatternIndex ? ' active' : ''
@@ -409,17 +425,17 @@ const settingsPanelHtml = isSettingsOpen
         <span>ミニマル表示（操作ボタンを隠す）</span>
       </label>
 
-        <label class="settings-check">
-          <input
-            type="checkbox"
-            ${isVoiceEnabled ? 'checked' : ''}
-            data-voice-toggle
-          >
-          <span>ローテヒントを再生（未実装）</span>
-        </label>
+      <label class="settings-check">
+        <input
+          type="checkbox"
+          ${isDecorated ? 'checked' : ''}
+          data-decorations-toggle
+        >
+        <span>標準タイトルバーを表示（非常用）</span>
+      </label>
 
         <p class="settings-note">
-          透明度とボイス設定は次の段階で有効化します。
+            標準タイトルバー表示は、自作バーで移動・終了ができなくなった場合の退避用です。
         </p>
       </div>
     </section>
@@ -428,6 +444,47 @@ const settingsPanelHtml = isSettingsOpen
 
   app.innerHTML = `
     <main class="app">
+  ${!isDecorated ? `
+    <div class="custom-titlebar">
+      <div class="custom-titlebar-drag" data-custom-titlebar data-tauri-drag-region>
+        <span class="custom-titlebar-title">Rotation Sigil</span>
+      </div>
+
+      <div class="custom-titlebar-tools">
+        <select class="custom-titlebar-select" data-monster-select>
+          ${monsterOptionsHtml}
+        </select>
+
+        <button
+          class="custom-titlebar-icon-button"
+          type="button"
+          data-settings-open
+          aria-label="設定"
+        >
+          ⚙
+        </button>
+
+        <button
+          class="custom-titlebar-icon-button"
+          type="button"
+          data-window-minimize
+          aria-label="最小化"
+        >
+          −
+        </button>
+
+        <button
+          class="custom-titlebar-icon-button custom-titlebar-close-button"
+          type="button"
+          data-window-close
+          aria-label="閉じる"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  ` : ''}
+
       <header class="app-header">
         <p class="eyebrow">Rotation Sigil</p>
         <p class="subtitle">ボスローテーション確認ツール / ${APP_VERSION}</p>
@@ -440,6 +497,7 @@ const settingsPanelHtml = isSettingsOpen
             <p class="version">Data version: ${escapeHtml(rotationData.version)}</p>
           </div>
 
+          ${isDecorated ? `
           <div class="monster-tools">
             <label class="monster-select-label">
               <span>ボス選択</span>
@@ -452,14 +510,13 @@ const settingsPanelHtml = isSettingsOpen
               ⚙ 設定
             </button>
           </div>
+        ` : ''}
         </div>
         <section class="list-panel">
-          <div class="list-header">
-            <p class="current-phase">${escapeHtml(phase.name)}</p>
-            <h3>
-              <span class="desktop-title">一覧モード</span>
-              <span class="mobile-title">選択中ローテ</span>
-            </h3>
+          <div class="list-header phase-header">
+            <div class="tabs phase-tabs phase-tabs-inline">
+              ${phaseTabsHtml}
+            </div>
           </div>
 
           <div class="rotation-list-grid">
@@ -468,22 +525,6 @@ const settingsPanelHtml = isSettingsOpen
         </section>
 
         ${settingsPanelHtml}
-
-        <div class="controls-block">
-          <section class="control-section">
-            <h3>HP段階</h3>
-            <div class="tabs phase-tabs">
-              ${phaseTabsHtml}
-            </div>
-          </section>
-
-          <section class="control-section">
-            <h3>ローテ / モード</h3>
-            <div class="tabs pattern-tabs">
-              ${patternTabsHtml}
-            </div>
-          </section>
-        </div>
 
       </section>
     </main>
@@ -542,7 +583,16 @@ const movePattern = (direction: 1 | -1) => {
   renderApp()
 }
 
-window.addEventListener('keydown', (event) => {
+window.addEventListener('keydown', async (event) => {
+  if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'd') {
+    event.preventDefault()
+    isDecorated = !isDecorated
+    localStorage.setItem(STORAGE_KEYS.decorated, String(isDecorated))
+    await applyDecorations()
+    renderApp()
+    return
+  }
+
   const target = event.target
 
   if (
@@ -598,6 +648,23 @@ const bindEvents = () => {
   const voiceToggle = document.querySelector<HTMLInputElement>('[data-voice-toggle]')
   const overlayListModeToggle = document.querySelector<HTMLInputElement>('[data-overlay-list-mode-toggle]')
   const minimalViewToggle = document.querySelector<HTMLInputElement>('[data-minimal-view-toggle]')
+  const decorationsToggle = document.querySelector<HTMLInputElement>('[data-decorations-toggle]')
+  const windowMinimizeButton = document.querySelector<HTMLButtonElement>('[data-window-minimize]')
+  const windowCloseButton = document.querySelector<HTMLButtonElement>('[data-window-close]')
+
+  windowMinimizeButton?.addEventListener('click', async () => {
+    await appWindow?.minimize()
+  })
+
+  windowCloseButton?.addEventListener('click', async () => {
+    await appWindow?.close()
+  })
+
+  decorationsToggle?.addEventListener('change', async () => {
+    isDecorated = decorationsToggle.checked
+    localStorage.setItem(STORAGE_KEYS.decorated, String(isDecorated))
+    await applyDecorations()
+  })
 
   minimalViewToggle?.addEventListener('change', () => {
     isMinimalView = minimalViewToggle.checked
@@ -766,8 +833,10 @@ overlayOpacity = getSavedOverlayOpacity()
 isVoiceEnabled = getSavedVoiceEnabled()
 isOverlayListMode = getSavedOverlayListMode()
 isMinimalView = getSavedMinimalView()
+isDecorated = getSavedDecorated()
 
 applyOverlayOpacity()
 applyOverlayViewMode()
 applyMinimalView()
+applyDecorations()
 loadRotationData()
