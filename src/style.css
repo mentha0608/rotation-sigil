@@ -51,6 +51,7 @@ h1 {
   border-radius: 16px;
   background: rgba(15, 23, 42, 0.82);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+  position: relative;
 }
 
 .monster-header {
@@ -590,9 +591,21 @@ h1 {
   margin-top: 0;
 }
 
-/* Tauriオーバーレイ用：左操作 / 右ローテ表示 */
+/* =========================================================
+   Tauriオーバーレイ用
+   - 左：操作エリア
+   - 右：選択中ローテ
+   - 背景透明度はCSS変数で制御する
+========================================================= */
+
+html.overlay,
 body.overlay {
-  background: rgba(5, 8, 22, 0.08);
+  --overlay-shell-bg: 0.08;
+  --overlay-panel-bg: 0.18;
+  --overlay-card-bg: 0.16;
+  --overlay-row-bg: 0.62;
+
+  background: rgba(5, 8, 22, var(--overlay-shell-bg));
 }
 
 body.overlay .app {
@@ -612,8 +625,9 @@ body.overlay .panel {
   padding: 6px;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 12px;
-  background: rgba(5, 8, 22, 0.1);
+  background: rgba(5, 8, 22, var(--overlay-shell-bg));
   box-shadow: none;
+  position: relative;
 }
 
 /* 左上：ボス選択 */
@@ -733,7 +747,7 @@ body.overlay .list-panel {
   padding: 6px;
   border: 1px solid rgba(96, 165, 250, 0.32);
   border-radius: 12px;
-  background: rgba(7, 18, 45, 0.18);
+  background: rgba(7, 18, 45, var(--overlay-panel-bg));
 }
 
 body.overlay .list-header {
@@ -750,23 +764,86 @@ body.overlay .list-header h3 {
   font-size: 14px;
 }
 
-/* Tauriでは選択中ローテだけ表示 */
+/* Tauri overlay：共通のローテカード見た目 */
 body.overlay .rotation-list-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+  gap: 8px;
 }
 
 body.overlay .rotation-card {
-  display: none;
   padding: 6px;
   border-radius: 12px;
   border-color: rgba(96, 165, 250, 0.38);
-  background: rgba(15, 23, 42, 0.16);
+  background: rgba(15, 23, 42, var(--overlay-card-bg));
 }
 
 body.overlay .rotation-card.active {
   display: block;
+}
+
+/* Tauri overlay：選択中のみモード */
+body.overlay.overlay-view-current .rotation-list-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+body.overlay.overlay-view-current .rotation-card {
+  display: none;
+}
+
+body.overlay.overlay-view-current .rotation-card.active {
+  display: block;
+}
+
+/* Tauri overlay：一覧モード */
+body.overlay.overlay-view-list .panel {
+  display: block;
+}
+
+body.overlay.overlay-view-list .monster-header {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+body.overlay.overlay-view-list .controls-block {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+body.overlay.overlay-view-list .tabs {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+body.overlay.overlay-view-list .tab {
+  width: auto;
+}
+
+body.overlay.overlay-view-list .phase-tabs,
+body.overlay.overlay-view-list .pattern-tabs {
+  min-height: 0;
+}
+
+body.overlay.overlay-view-list .list-panel {
+  margin-top: 8px;
+}
+
+body.overlay.overlay-view-list .rotation-list-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+body.overlay.overlay-view-list .rotation-card {
+  display: block;
+}
+
+body.overlay.overlay-view-list .rotation-card.special {
+  grid-column: 1 / -1;
+}
+
+body.overlay.overlay-view-list .rotation-card.special .action-list.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 body.overlay .rotation-card.special {
@@ -791,7 +868,7 @@ body.overlay .action-list.compact li {
   gap: 5px;
   padding: 4px 6px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.62);
+  background: rgba(15, 23, 42, var(--overlay-row-bg));
   font-size: 10.5px;
   line-height: 1.25;
 }
@@ -804,4 +881,165 @@ body.overlay .action-index {
 
 body.overlay .action-text {
   min-height: 19px;
+}
+
+/* 設定ボタン */
+.settings-open-button {
+  width: 100%;
+  margin-top: 8px;
+  min-height: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  color: #e5edf9;
+  background: rgba(15, 23, 42, 0.62);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.settings-open-button:hover {
+  background: rgba(30, 41, 59, 0.9);
+}
+
+body.overlay .settings-open-button {
+  min-height: 26px;
+  margin-top: 8px;
+  padding: 3px 6px;
+  font-size: 10px;
+}
+
+/* 設定パネル */
+.settings-panel {
+  position: absolute;
+  inset: 6px;
+  z-index: 20;
+  padding: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.38);
+  border-radius: 12px;
+  background: rgba(5, 8, 22, 0.92);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.36);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.settings-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-close-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  color: #e5edf9;
+  background: rgba(15, 23, 42, 0.72);
+  cursor: pointer;
+}
+
+.settings-body {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-field,
+.settings-check {
+  display: grid;
+  gap: 6px;
+  color: #dbeafe;
+  font-size: 13px;
+}
+
+.settings-check {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.settings-note {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+body.overlay .settings-panel {
+  inset: 4px;
+  padding: 8px;
+  background: rgba(5, 8, 22, 0.88);
+}
+
+body.overlay .settings-header h3 {
+  font-size: 14px;
+}
+
+body.overlay .settings-field,
+body.overlay .settings-check,
+body.overlay .settings-note {
+  font-size: 11px;
+}
+
+/* ミニマル表示：Tauri overlayでは操作ボタンだけ隠し、設定ボタンは残す */
+body.overlay.minimal-view .controls-block .control-section {
+  display: none;
+}
+
+body.overlay.minimal-view .settings-open-button {
+  margin-top: 0;
+}
+
+/* Tauri overlay：左上のボス名は右上のボス選択と重複するため隠す */
+body.overlay .monster-header h2 {
+  display: none;
+}
+
+/* ボス選択＋設定をまとめる */
+.monster-tools {
+  display: grid;
+  gap: 6px;
+}
+
+/* Tauri overlay：右上ツールを小さくまとめる */
+body.overlay .monster-tools {
+  gap: 4px;
+}
+
+body.overlay .monster-tools .settings-open-button {
+  margin-top: 0;
+}
+
+/* Tauri overlay：右上の設定ボタンは小型アイコン化 */
+body.overlay .monster-tools {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+}
+
+body.overlay .monster-tools .monster-select-label {
+  flex: 0 0 96px;
+}
+
+body.overlay .monster-tools .settings-open-button {
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  min-height: 28px;
+  margin-top: 0;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+}
+
+body.overlay .monster-tools .settings-open-button::before {
+  content: "⚙";
+  font-size: 12px;
+}
+
+/* ミニマル表示：操作ブロックが空になるため、余白と線ごと隠す */
+body.overlay.minimal-view .controls-block {
+  display: none;
 }
