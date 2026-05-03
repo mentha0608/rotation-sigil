@@ -73,7 +73,7 @@ if (isTauri) {
 // ===== 3. アプリ情報 =====
 // 配布時に画面へ表示するアプリ本体のバージョン。
 // package.json / tauri.conf.json の version と合わせて更新する。
-const APP_VERSION = 'v0.1.0'
+const APP_VERSION = 'v0.1.1'
 
 let manifest: Manifest | null = null
 let rotationData: RotationData | null = null
