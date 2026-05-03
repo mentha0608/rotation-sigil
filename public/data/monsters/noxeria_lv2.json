@@ -10,17 +10,13 @@
         { "text": "呪災", "style": "curse" },
         { "text": "絶叫", "style": "scream" },
         { "text": "パラライズ", "style": "paralyze" },
-        { "text": "燦滅爆雷", "style": "thunder" },
+        { "text": "封還のわざわい", "style": "water" },
         { "text": "燦滅光", "style": "laser" },
-        { "text": "燦然たる息吹", "style": "earth" },
-        { "text": "息吹", "style": "earth" },
-        { "text": "恨みのはどう", "style": "earth" },
         { "text": "じひびき", "style": "earth" },
         { "text": "いてつく雷鳴", "style": "ice" },
         { "text": "メイルストロム", "style": "water" },
-        { "text": "コーラルレイン", "style": "water" },
         { "text": "イバラの牢獄", "style": "prison" },
-        { "text": "イオマータ", "style": "magic" }
+        { "text": "恨みのはどう", "style": "earth" }
       ],
       "phases": [
         {
@@ -28,7 +24,7 @@
           "name": "HP75%〜",
           "patterns": [
             {
-              "id": "blue",
+              "id": "青嵐",
               "name": "青嵐ローテ",
               "actions": [
                 "青嵐の号令",
@@ -40,7 +36,7 @@
               ]
             },
             {
-              "id": "burst",
+              "id": "爆裂",
               "name": "爆裂ローテ",
               "actions": [
                 "爆裂の号令",
@@ -53,7 +49,7 @@
               ]
             },
             {
-              "id": "seal",
+              "id": "封還",
               "name": "封還ローテ",
               "actions": [
                 "通常 / 連撃",
@@ -73,7 +69,7 @@
           "name": "HP50%〜",
           "patterns": [
             {
-              "id": "blue",
+              "id": "青嵐",
               "name": "青嵐ローテ",
               "actions": [
                 "イオマータ",
@@ -86,7 +82,7 @@
               ]
             },
             {
-              "id": "burst",
+              "id": "爆裂",
               "name": "爆裂ローテ",
               "actions": [
                 "爆裂の号令",
@@ -98,7 +94,7 @@
               ]
             },
             {
-              "id": "seal",
+              "id": "封還",
               "name": "封還ローテ",
               "actions": [
                 "通常 / 連撃",
@@ -112,7 +108,7 @@
               ]
             },
             {
-              "id": "prison",
+              "id": "牢獄",
               "name": "牢獄ローテ",
               "actions": [
                 "イバラの牢獄",
@@ -127,7 +123,7 @@
           "name": "HP25%〜",
           "patterns": [
             {
-              "id": "blue",
+              "id": "青嵐",
               "name": "青嵐ローテ",
               "actions": [
                 "青嵐の号令",
@@ -138,7 +134,7 @@
               ]
             },
             {
-              "id": "burst",
+              "id": "爆裂",
               "name": "爆裂ローテ",
               "actions": [
                 "爆裂の号令",
@@ -151,7 +147,7 @@
               ]
             },
             {
-              "id": "seal",
+              "id": "封還",
               "name": "封還ローテ",
               "actions": [
                 "通常 / 連撃",
@@ -165,7 +161,7 @@
               ]
             },
             {
-              "id": "prison",
+              "id": "牢獄",
               "name": "牢獄ローテ",
               "actions": [
                 "イバラの牢獄",

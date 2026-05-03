@@ -1055,3 +1055,252 @@ body.overlay .monster-tools .settings-open-button::before {
 body.overlay.minimal-view .controls-block {
   display: none;
 }
+
+/* 上部HP段階タブ */
+body.overlay .phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+
+body.overlay .phase-tabs-inline {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 0;
+}
+
+body.overlay .phase-tabs-inline .tab {
+  width: auto;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* 下部HP段階エリアは使わない */
+body.overlay .controls-block {
+  display: none;
+}
+
+/* =========================================================
+   Compact overlay tuning
+   - ローテ表示を横長・低めにする
+========================================================= */
+
+/* 外側パネルを少し薄く */
+body.overlay .list-panel {
+  padding: 4px;
+  border-radius: 10px;
+}
+
+/* HP段階タブとカードの間を詰める */
+body.overlay .list-header {
+  margin-bottom: 4px;
+}
+
+/* カード自体を薄く */
+body.overlay .rotation-card {
+  padding: 4px 5px;
+  border-radius: 10px;
+}
+
+/* カード見出しを詰める */
+body.overlay .rotation-card-header {
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+body.overlay .rotation-card-header h4 {
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+/* idバッジを少し小さく */
+body.overlay .tab-id {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  font-size: 8.5px;
+}
+
+/* 行間を詰める */
+body.overlay .action-list.compact {
+  gap: 3px;
+}
+
+/* 行の高さを削る */
+body.overlay .action-list.compact li {
+  grid-template-columns: 18px 1fr;
+  gap: 4px;
+  padding: 3px 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+/* 行番号バッジを小さく */
+body.overlay .action-index {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+}
+
+/* テキスト側の最低高さも下げる */
+body.overlay .action-text {
+  min-height: 16px;
+}
+
+/* Tauri overlay：ボス選択ラベル文字だけ非表示 */
+body.overlay .monster-tools .monster-select-label > span {
+  display: none;
+}
+
+/* ラベルを消したぶん、セレクト位置を少し整える */
+body.overlay .monster-tools .monster-select-label {
+  gap: 0;
+}
+
+/* ローテカード見出しを本文に近いサイズへ */
+body.overlay .rotation-card-header h4 {
+  font-size: 10.5px;
+  line-height: 1.15;
+}
+
+/* 見出し行の高さも本文に近づける */
+body.overlay .rotation-card-header {
+  min-height: 18px;
+}
+
+/* 自作タイトルバー：標準タイトルバーOFF時だけ表示 */
+.custom-titlebar {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 0 6px 0 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.44);
+  user-select: none;
+}
+
+.custom-titlebar-title {
+  min-width: 0;
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.custom-titlebar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-titlebar-buttons button {
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  color: #e5edf9;
+  background: rgba(15, 23, 42, 0.48);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.custom-titlebar-buttons button:hover {
+  background: rgba(51, 65, 85, 0.78);
+}
+
+/* 自作タイトルバー：標準タイトルバーOFF時の統合ヘッダー */
+.custom-titlebar {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 0 6px 0 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 10px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.48);
+  user-select: none;
+}
+
+.custom-titlebar-drag {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.custom-titlebar-title {
+  min-width: 0;
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.custom-titlebar-tools {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.custom-titlebar-select {
+  width: 112px;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 999px;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.86);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.custom-titlebar-select:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.55);
+  outline-offset: 1px;
+}
+
+.custom-titlebar-icon-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  color: #e5edf9;
+  background: rgba(15, 23, 42, 0.58);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.custom-titlebar-icon-button:hover {
+  background: rgba(51, 65, 85, 0.82);
+}
+
+.custom-titlebar-close-button:hover {
+  border-color: rgba(248, 113, 113, 0.62);
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.62);
+}
