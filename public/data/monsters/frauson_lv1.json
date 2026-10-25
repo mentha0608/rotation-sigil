@@ -1,0 +1,82 @@
+{
+  "version": "2026.05.06",
+  "monsters": [
+    {
+      "id": "frauson_lv1",
+      "name": "フラウソン",
+      "level": "Lv1",
+      "keywords": [
+        { "text": "トライスマッシュ", "style": "strong" },
+        { "text": "黄色の滅閃", "style": "laser" },
+        { "text": "黄色の災い", "style": "thunder" }
+      ],
+      "phases": [
+        {
+          "id": "hp90",
+          "name": "HP90%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "固定ローテ",
+              "span": "full",
+              "actions": [
+                "先兵召喚",
+                "通常攻撃",
+                "トライスマッシュ",
+                "黄色の滅閃",
+                "黄色の災い"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp75",
+          "name": "HP75%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "固定ローテ",
+              "span": "full",
+              "actions": [
+                "先兵召喚",
+                "トライスマッシュ",
+                "黄色の滅閃",
+                "黄色の災い"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp50",
+          "name": "HP50%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "初回固定",
+              "span": "full",
+              "actions": [
+                "（最初のみ）先兵召集の号砲",
+                "ランダム"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp25",
+          "name": "HP25%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "初回固定",
+              "span": "full",
+              "actions": [
+                "（最初のみ）凶禍の分与",
+                "ランダム"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -11,6 +11,31 @@
       "path": "data/monsters/noxeria_lv2.json"
     },
     {
+      "id": "willyde_lv1_lv2",
+      "name": "ウィリーデ Lv1/Lv2",
+      "path": "data/monsters/willyde_lv1_lv2.json"
+    },
+    {
+      "id": "frauson_lv1",
+      "name": "フラウソン Lv1",
+      "path": "data/monsters/frauson_lv1.json"
+    },
+    {
+      "id": "frauson_lv2",
+      "name": "フラウソン Lv2",
+      "path": "data/monsters/frauson_lv2.json"
+    },
+    {
+      "id": "aulmod_lv1",
+      "name": "アウルモッド Lv1",
+      "path": "data/monsters/aulmod_lv1.json"
+    },
+    {
+      "id": "aulmod_lv2",
+      "name": "アウルモッド Lv2",
+      "path": "data/monsters/aulmod_lv2.json"
+    },
+    {
       "id": "ruberangis_lv3",
       "name": "ルベランギス Lv3",
       "path": "data/monsters/ruberangis_lv3.json"

@@ -1,0 +1,256 @@
+{
+  "version": "2026.05.06",
+  "monsters": [
+    {
+      "id": "aulmod_lv2",
+      "name": "アウルモッド",
+      "level": "Lv2",
+      "keywords": [
+        { "text": "振り下ろす怒号", "style": "strong" },
+        { "text": "怒号", "style": "strong" },
+        { "text": "地烈スプラッシュ", "style": "earth" },
+        { "text": "地烈", "style": "earth" },
+        { "text": "終末の激震", "style": "earth" },
+        { "text": "死毒の旋風", "style": "curse" },
+        { "text": "絶念の叫び", "style": "scream" },
+        { "text": "はげしいおたけび", "style": "scream" }
+      ],
+      "phases": [
+        {
+          "id": "hp100",
+          "name": "HP100%〜",
+          "layout": {
+            "columns": 1
+          },
+          "patterns": [
+            {
+              "id": "B",
+              "name": "ランダム",
+              "span": "full",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "振り下ろす怒号" },
+                { "mark": "・", "text": "絶対零度" },
+                { "mark": "・", "text": "終末の激震" },
+                { "mark": "・", "text": "地烈スプラッシュ" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp90",
+          "name": "HP90%〜",
+          "layout": {
+            "columns": 4
+          },
+          "patterns": [
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "運命の円陣",
+                "分散orジャッジ",
+                "ダークネスブレス",
+                "振り下ろす怒号",
+                "絶対零度",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "振り下ろす怒号※" },
+                { "mark": "・", "text": "ダークネスブレス※" },
+                { "mark": "・", "text": "終末の激震" },
+                { "mark": "・", "text": "地烈スプラッシュ※" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "振り下ろす怒号" },
+                { "mark": "・", "text": "絶対零度※" },
+                { "mark": "・", "text": "分散する災禍" },
+                { "mark": "・", "text": "はげしいおたけび" },
+                { "mark": "・", "text": "ジャッジメントフレア" },
+                { "mark": "・", "text": "Aモード移行" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp75",
+          "name": "HP75%〜",
+          "layout": {
+            "columns": 4
+          },
+          "patterns": [
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "運命の魔結晶",
+                "振り下ろす怒号",
+                "絶対零度",
+                "分散orジャッジ",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "振り下ろす怒号※" },
+                { "mark": "・", "text": "ダークネスブレス※" },
+                { "mark": "・", "text": "終末の激震" },
+                { "mark": "・", "text": "ジャッジメントフレア" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "振り下ろす怒号※" },
+                { "mark": "・", "text": "死毒の旋風※" },
+                { "mark": "・", "text": "分散する災禍" },
+                { "mark": "・", "text": "はげしいおたけび" },
+                { "mark": "・", "text": "絶念の叫び※" },
+                { "mark": "・", "text": "AorDモード移行" }
+              ]
+            },
+            {
+              "id": "D",
+              "name": "Dローテ",
+              "actions": [
+                "双紅の血陣※",
+                "絶対零度※",
+                "Bモード移行"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp50",
+          "name": "HP50%〜",
+          "layout": {
+            "columns": 3
+          },
+          "patterns": [
+            {
+              "id": "dance",
+              "name": "円舞ローテ",
+              "span": "full",
+              "actions": [
+                "終わりなき運命の円舞",
+                "絶対零度 or ダークネスブレス",
+                "振り下ろす怒号 or 地烈スプラッシュ",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "分散する災禍※",
+                "絶対零度※",
+                "振り下ろす怒号",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "振り下ろす怒号" },
+                { "mark": "・", "text": "終末の激震" },
+                { "mark": "・", "text": "地烈スプラッシュ" },
+                { "mark": "・", "text": "双紅の血陣" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "ダークネスブレス" },
+                { "mark": "・", "text": "死毒の旋風" },
+                { "mark": "・", "text": "分散する災禍" },
+                { "mark": "・", "text": "地烈スプラッシュ" },
+                { "mark": "・", "text": "ジャッジメントフレア" },
+                { "mark": "・", "text": "Aモード移行" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp25",
+          "name": "HP25%〜",
+          "layout": {
+            "columns": 3
+          },
+          "patterns": [
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "絶対零度",
+                "ジャッジメントフレア",
+                "分散する災禍",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "分散する災禍" },
+                { "mark": "・", "text": "終末の激震" },
+                { "mark": "・", "text": "地烈スプラッシュ" },
+                { "mark": "・", "text": "双紅の血陣" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "振り下ろす怒号" },
+                { "mark": "・", "text": "ダークネスブレス" },
+                { "mark": "・", "text": "死毒の旋風" },
+                { "mark": "・", "text": "地烈スプラッシュ" },
+                { "mark": "・", "text": "ジャッジメントフレア" },
+                { "mark": "・", "text": "Aモード移行" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "counter",
+          "name": "押し反撃",
+          "layout": {
+            "columns": 1
+          },
+          "patterns": [
+            {
+              "id": "counter",
+              "name": "押し合い反撃",
+              "span": "full",
+              "actions": [
+                { "mark": "反", "text": "振り下ろす怒号" },
+                { "mark": "反", "text": "終末の激震" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

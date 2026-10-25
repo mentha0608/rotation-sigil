@@ -1,5 +1,13 @@
 import './style.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import {
+  adjustRuberangisTimer,
+  configureRuberangisTimer,
+  getRuberangisTimerSnapshot,
+  startRuberangisTimer,
+  stopRuberangisTimer,
+  type RuberangisLevel,
+} from './ruberangisTimer'
 
 // ===== 1. 型定義 =====
 // manifest.json / monster json の構造を定義する。
@@ -33,9 +41,14 @@ type Keyword = {
   style: string
 }
 
+type PhaseLayout = {
+  columns?: 1 | 2 | 3 | 4 | 5 | 6
+}
+
 type Phase = {
   id: string
   name: string
+  layout?: PhaseLayout
   patterns: Pattern[]
 }
 
@@ -49,7 +62,8 @@ type Action =
 type Pattern = {
   id: string
   name: string
-  tag: string
+  tag?: string
+  span?: 'full'
   actions: Action[]
 }
 
@@ -76,7 +90,7 @@ const appWindow = isTauri ? getCurrentWindow() : null
 // ===== 3. アプリ情報 =====
 // 配布時に画面へ表示するアプリ本体のバージョン。
 // package.json / tauri.conf.json の version と合わせて更新する。
-const APP_VERSION = 'v0.1.2'
+const APP_VERSION = 'v0.2.0'
 
 let manifest: Manifest | null = null
 let rotationData: RotationData | null = null
@@ -86,7 +100,12 @@ let selectedPhaseIndex = 0
 let selectedPatternIndex = 0
 let isSettingsOpen = false
 let overlayOpacity = 50
-let isVoiceEnabled = false
+let combatFontScale = 100
+let ruberangisLeadSeconds: 7 | 10 = 7
+let ruberangisPlayNextVoice = true
+let ruberangisMetronomeInterval: 0 | 5 | 10 = 0
+let ruberangisVoiceVolume = 70
+let ruberangisSeVolume = 85
 let isDecorated = true
 
 // ===== 4. 保存設定 localStorage =====
@@ -96,7 +115,12 @@ let isDecorated = true
 const STORAGE_KEYS = {
   monsterId: 'rotation-sigil:selectedMonsterId',
   overlayOpacity: 'rotation-sigil:overlayOpacity',
-  voiceEnabled: 'rotation-sigil:voiceEnabled',
+  combatFontScale: 'rotation-sigil:combatFontScale',
+  ruberangisLeadSeconds: 'rotation-sigil:ruberangisLeadSeconds',
+  ruberangisPlayNextVoice: 'rotation-sigil:ruberangisPlayNextVoice',
+  ruberangisMetronomeInterval: 'rotation-sigil:ruberangisMetronomeInterval',
+  ruberangisVoiceVolume: 'rotation-sigil:ruberangisVoiceVolume',
+  ruberangisSeVolume: 'rotation-sigil:ruberangisSeVolume',
   decorated: 'rotation-sigil:decorated'
 }
 
@@ -115,9 +139,61 @@ const getSavedOverlayOpacity = () => {
   return clampOpacity(value)
 }
 
-const getSavedVoiceEnabled = () => {
-  return localStorage.getItem(STORAGE_KEYS.voiceEnabled) === 'true'
+const getSavedCombatFontScale = () => {
+  const value = Number(
+    localStorage.getItem(STORAGE_KEYS.combatFontScale) ?? '100'
+  )
+
+  return Math.min(150, Math.max(100, value))
 }
+
+const getSavedRuberangisLeadSeconds = (): 7 | 10 => {
+  const value = Number(localStorage.getItem(STORAGE_KEYS.ruberangisLeadSeconds) ?? '7')
+  return value === 10 ? 10 : 7
+}
+
+const getSavedRuberangisPlayNextVoice = () => {
+  return localStorage.getItem(STORAGE_KEYS.ruberangisPlayNextVoice) !== 'false'
+}
+
+const getSavedRuberangisMetronomeInterval = (): 0 | 5 | 10 => {
+  const value = Number(
+    localStorage.getItem(STORAGE_KEYS.ruberangisMetronomeInterval) ?? '0',
+  )
+
+  if (value === 5 || value === 10) {
+    return value
+  }
+
+  return 0
+}
+
+const getSavedRuberangisVolume = (key: string, fallback: number) => {
+  const value = Number(localStorage.getItem(key) ?? String(fallback))
+  return Math.min(100, Math.max(0, value))
+}
+
+const applyRuberangisTimerSettings = () => {
+  configureRuberangisTimer({
+    leadSeconds: ruberangisLeadSeconds,
+    playNextVoice: ruberangisPlayNextVoice,
+    metronomeInterval: ruberangisMetronomeInterval,
+    voiceVolume: ruberangisVoiceVolume / 100,
+    seVolume: ruberangisSeVolume / 100,
+  })
+}
+
+const applyCombatFontScale = () => {
+  document.documentElement.style.setProperty(
+    '--combat-font-scale',
+    String(combatFontScale / 100),
+  )
+}
+
+// ===== 将来用：音声読み上げ設定 =====
+// const getSavedVoiceEnabled = () => {
+//   return localStorage.getItem(STORAGE_KEYS.voiceEnabled) === 'true'
+// }
 
 const getSavedMonsterId = () => {
   return localStorage.getItem(STORAGE_KEYS.monsterId)
@@ -242,6 +318,106 @@ const getCurrentPhase = () => {
   return monster?.phases[selectedPhaseIndex]
 }
 
+const getRuberangisLevel = (monster: Monster): RuberangisLevel | null => {
+  if (monster.id === 'ruberangis_lv2') {
+    return 2
+  }
+
+  if (monster.id === 'ruberangis_lv3') {
+    return 3
+  }
+
+  return null
+}
+
+const moveToPhase = (phaseNamePrefix: string) => {
+  const monster = getCurrentMonster()
+
+  if (!monster) {
+    return
+  }
+
+  const phaseIndex = monster.phases.findIndex((phase) =>
+    phase.name.startsWith(phaseNamePrefix),
+  )
+
+  if (phaseIndex < 0) {
+    console.warn(`${phaseNamePrefix} のHP段階が見つかりません`)
+    return
+  }
+
+  selectedPhaseIndex = phaseIndex
+  selectedPatternIndex = 0
+  renderApp()
+}
+
+// ===== 6.5 ルベランギス・カラミティ開始共通処理 =====
+// 画面ボタンとマウスサイドボタンの両方から同じ処理を呼ぶ。
+// これにより、タイマー開始とHP段階移動の挙動を1か所で管理できる。
+
+const startRuberangisCalamity = (mode: 'circle' | 'grand') => {
+  const monster = getCurrentMonster()
+
+  if (!monster) {
+    return
+  }
+
+  const level = getRuberangisLevel(monster)
+
+  if (!level) {
+    return
+  }
+
+  startRuberangisTimer(mode, level)
+
+  if (mode === 'circle') {
+    // サークルカラミティ → HP90%帯
+    moveToPhase('HP90')
+    return
+  }
+
+  // グランドカラミティ → HP50%帯
+  moveToPhase('HP50')
+}
+
+const getPhaseLayoutClass = (phase: Phase) => {
+  const columns = phase.layout?.columns
+
+  if (columns === 1) {
+    return ' layout-columns-1'
+  }
+
+  if (columns === 2) {
+    return ' layout-columns-2'
+  }
+
+  if (columns === 4) {
+    return ' layout-columns-4'
+  }
+
+  if (columns === 5) {
+    return ' layout-columns-5'
+  }
+
+  if (columns === 6) {
+    return ' layout-columns-6'
+  }
+
+  return ' layout-columns-3'
+}
+
+const getPatternSpanClass = (pattern: Pattern, patternIndex: number, phase: Phase) => {
+  if (pattern.span === 'full') {
+    return ' span-full'
+  }
+
+  if (!phase.layout?.columns && (patternIndex >= 3 || pattern.id === 'prison')) {
+    return ' span-full'
+  }
+
+  return ''
+}
+
 // ===== 7. 描画：ローディング / エラー =====
 // 初期読み込み中・データ読み込み失敗時の画面を描画する。
 
@@ -300,6 +476,10 @@ const renderApp = () => {
   }
 
   const levelText = monster.level ? ` ${escapeHtml(monster.level)}` : ''
+  const ruberangisLevel = getRuberangisLevel(monster)
+  const ruberangisTimerSnapshot = ruberangisLevel
+    ? getRuberangisTimerSnapshot()
+    : null
 
   const monsterOptionsHtml = manifest?.monsters
   .map((manifestMonster, index) => {
@@ -329,7 +509,7 @@ const renderApp = () => {
   const rotationCardsHtml = phase.patterns
     .map((pattern, patternIndex) => {
       const isActive = patternIndex === selectedPatternIndex ? ' active' : ''
-      const isSpecial = patternIndex >= 3 || pattern.id === 'prison' ? ' special' : ''
+      const spanClass = getPatternSpanClass(pattern, patternIndex, phase)
 
   const actionsHtml = pattern.actions
     .map((action, actionIndex) => {
@@ -346,7 +526,7 @@ const renderApp = () => {
     .join('')
 
       return `
-        <article class="rotation-card${isActive}${isSpecial}" data-pattern-card-index="${patternIndex}">
+        <article class="rotation-card${isActive}${spanClass}" data-pattern-card-index="${patternIndex}">
           <div class="rotation-card-header">
             <span class="tab-id">${escapeHtml(pattern.id)}</span>
             <h4>${escapeHtml(pattern.name)}</h4>
@@ -359,6 +539,79 @@ const renderApp = () => {
       `
     })
     .join('')
+
+  const ruberangisTimerHtml = ruberangisLevel
+    ? (() => {
+        const isRunning = ruberangisTimerSnapshot?.running ?? false
+        const mode = ruberangisTimerSnapshot?.mode ?? null
+
+        const statusText =
+          isRunning && mode === 'circle'
+            ? '🔊 サークルカラミティタイマー読み上げ中'
+            : isRunning && mode === 'grand'
+              ? '🔊 グランドカラミティタイマー読み上げ中'
+              : '🔇 停止中'
+
+        const statusClass = isRunning ? ' is-running' : ' is-stopped'
+
+        return `
+          <section class="ruberangis-timer-panel">
+            <div class="ruberangis-timer-main-buttons">
+              <button
+                class="ruberangis-timer-button ruberangis-timer-circle"
+                type="button"
+                data-ruberangis-circle
+              >
+                サークルカラミティ
+              </button>
+
+              <button
+                class="ruberangis-timer-button ruberangis-timer-grand"
+                type="button"
+                data-ruberangis-grand
+              >
+                グランドカラミティ
+              </button>
+            </div>
+
+            <div class="ruberangis-timer-adjust-buttons">
+              <button
+                class="ruberangis-timer-adjust-button"
+                type="button"
+                data-ruberangis-adjust-minus
+                ${isRunning ? '' : 'disabled'}
+              >
+                -0.5秒
+              </button>
+
+              <button
+                class="ruberangis-timer-adjust-button"
+                type="button"
+                data-ruberangis-adjust-plus
+                ${isRunning ? '' : 'disabled'}
+              >
+                +0.5秒
+              </button>
+            </div>
+
+            <div class="ruberangis-timer-status-row">
+              <p class="ruberangis-timer-status${statusClass}">
+                ${statusText}
+              </p>
+
+              <button
+                class="ruberangis-timer-mini-button ruberangis-timer-stop"
+                type="button"
+                data-ruberangis-stop
+                ${isRunning ? '' : 'disabled'}
+              >
+                停止
+              </button>
+            </div>
+          </section>
+        `
+      })()
+    : ''
 
 const settingsPanelHtml = isSettingsOpen
   ? `
@@ -374,7 +627,7 @@ const settingsPanelHtml = isSettingsOpen
         <p class="settings-note">
           Rotation Sigil ${APP_VERSION}
         </p>
-        <label class="settings-field">
+      <label class="settings-field">
           <span>不透明度</span>
           <input
             type="range"
@@ -384,6 +637,116 @@ const settingsPanelHtml = isSettingsOpen
             data-opacity-slider
           >
       </label>
+      <label class="settings-field">
+          <span>文字サイズ：${combatFontScale}% ※アプリ版のみ</span>
+          <input
+            type="range"
+            min="100"
+            max="150"
+            step="5"
+            value="${combatFontScale}"
+            data-font-scale-slider
+          >
+      </label>
+
+      <section class="settings-group">
+        <h4>ルベランギスタイマー</h4>
+
+        <div class="settings-choice-row">
+          <span>事前読み上げ</span>
+          <div class="settings-choice-buttons">
+            <label class="settings-choice">
+              <input
+                type="radio"
+                name="ruberangis-lead"
+                value="7"
+                ${ruberangisLeadSeconds === 7 ? 'checked' : ''}
+                data-ruberangis-lead
+              >
+              <span>7秒</span>
+            </label>
+            <label class="settings-choice">
+              <input
+                type="radio"
+                name="ruberangis-lead"
+                value="10"
+                ${ruberangisLeadSeconds === 10 ? 'checked' : ''}
+                data-ruberangis-lead
+              >
+              <span>10秒</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="settings-check">
+          <input
+            type="checkbox"
+            ${ruberangisPlayNextVoice ? 'checked' : ''}
+            data-ruberangis-next-voice
+          >
+          <span>次案内を再生する</span>
+        </label>
+
+        <div class="settings-choice-row">
+          <span>メトロノーム</span>
+          <div class="settings-choice-buttons settings-choice-buttons-3">
+            <label class="settings-choice">
+              <input
+                type="radio"
+                name="ruberangis-metronome"
+                value="0"
+                ${ruberangisMetronomeInterval === 0 ? 'checked' : ''}
+                data-ruberangis-metronome
+              >
+              <span>OFF</span>
+            </label>
+            <label class="settings-choice">
+              <input
+                type="radio"
+                name="ruberangis-metronome"
+                value="10"
+                ${ruberangisMetronomeInterval === 10 ? 'checked' : ''}
+                data-ruberangis-metronome
+              >
+              <span>10秒毎</span>
+            </label>
+            <label class="settings-choice">
+              <input
+                type="radio"
+                name="ruberangis-metronome"
+                value="5"
+                ${ruberangisMetronomeInterval === 5 ? 'checked' : ''}
+                data-ruberangis-metronome
+              >
+              <span>5秒毎</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="settings-field">
+          <span>VOICE音量：${ruberangisVoiceVolume}%</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value="${ruberangisVoiceVolume}"
+            data-ruberangis-voice-volume
+          >
+        </label>
+
+        <label class="settings-field">
+          <span>SE音量：${ruberangisSeVolume}%</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value="${ruberangisSeVolume}"
+            data-ruberangis-se-volume
+          >
+        </label>
+      </section>
 
       <label class="settings-check">
         <input
@@ -479,9 +842,11 @@ const settingsPanelHtml = isSettingsOpen
             </div>
           </div>
 
-          <div class="rotation-list-grid">
+          <div class="rotation-list-grid${getPhaseLayoutClass(phase)}">
             ${rotationCardsHtml}
           </div>
+
+          ${ruberangisTimerHtml}
         </section>
 
         ${settingsPanelHtml}
@@ -530,19 +895,6 @@ const movePhase = (direction: 1 | -1) => {
   renderApp()
 }
 
-const movePattern = (direction: 1 | -1) => {
-  const phase = getCurrentPhase()
-
-  if (!phase) {
-    return
-  }
-
-  selectedPatternIndex =
-    (selectedPatternIndex + direction + phase.patterns.length) % phase.patterns.length
-
-  renderApp()
-}
-
 window.addEventListener('keydown', async (event) => {
   if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'd') {
     event.preventDefault()
@@ -584,13 +936,80 @@ window.addEventListener('keydown', async (event) => {
 
   if (event.key === ',') {
     event.preventDefault()
-    movePattern(-1)
+    movePhase(-1)
     return
   }
 
   if (event.key === '.') {
     event.preventDefault()
-    movePattern(1)
+    movePhase(1)
+  }
+})
+
+// ===== 9.6 マウスホイールでHP段階切り替え =====
+// ホイール上：前のHP段階へ
+// ホイール下：次のHP段階へ
+//
+// マウスホイールは1回の操作で複数イベントが発生する場合があるため、
+// 短いクールタイムを設けて一気に何段階も移動するのを防ぐ。
+
+let isWheelLocked = false
+
+window.addEventListener('wheel', (event) => {
+  // 設定画面を開いている間はHP段階を切り替えない
+  if (isSettingsOpen) {
+    return
+  }
+
+  // 小さすぎる入力は無視する
+  if (Math.abs(event.deltaY) < 10) {
+    return
+  }
+
+  // 連続入力による飛びすぎ防止
+  if (isWheelLocked) {
+    return
+  }
+
+  isWheelLocked = true
+
+  if (event.deltaY < 0) {
+    // ホイール上 → 前のHP段階
+    movePhase(-1)
+  } else {
+    // ホイール下 → 次のHP段階
+    movePhase(1)
+  }
+
+  setTimeout(() => {
+    isWheelLocked = false
+  }, 150)
+})
+
+// ===== 9.7 マウスサイドボタンでカラミティ開始 =====
+// 実機確認済みのM705割り当て：
+//   上側サイドボタン（event.button === 4）→ サークルカラミティ
+//   下側サイドボタン（event.button === 3）→ グランドカラミティ
+//
+// WebViewがアクティブな時だけ有効。
+// ルベランギス以外では何もしない。
+
+window.addEventListener('mousedown', (event) => {
+  const monster = getCurrentMonster()
+
+  if (!monster || !getRuberangisLevel(monster)) {
+    return
+  }
+
+  if (event.button === 4) {
+    event.preventDefault()
+    startRuberangisCalamity('circle')
+    return
+  }
+
+  if (event.button === 3) {
+    event.preventDefault()
+    startRuberangisCalamity('grand')
   }
 })
 
@@ -605,10 +1024,33 @@ const bindEvents = () => {
   const settingsOpenButton = document.querySelector<HTMLButtonElement>('[data-settings-open]')
   const settingsCloseButton = document.querySelector<HTMLButtonElement>('[data-settings-close]')
   const opacitySlider = document.querySelector<HTMLInputElement>('[data-opacity-slider]')
-  const voiceToggle = document.querySelector<HTMLInputElement>('[data-voice-toggle]')
+  const fontScaleSlider = document.querySelector<HTMLInputElement>('[data-font-scale-slider]')
+  const ruberangisLeadRadios =
+    document.querySelectorAll<HTMLInputElement>('[data-ruberangis-lead]')
+  const ruberangisNextVoiceToggle =
+    document.querySelector<HTMLInputElement>('[data-ruberangis-next-voice]')
+  const ruberangisMetronomeRadios =
+    document.querySelectorAll<HTMLInputElement>('[data-ruberangis-metronome]')
+  const ruberangisVoiceVolumeSlider =
+    document.querySelector<HTMLInputElement>('[data-ruberangis-voice-volume]')
+  const ruberangisSeVolumeSlider =
+    document.querySelector<HTMLInputElement>('[data-ruberangis-se-volume]')
+  // 将来用：音声読み上げ
+  // const voiceToggle =
+  //   document.querySelector<HTMLInputElement>('[data-voice-toggle]')
   const decorationsToggle = document.querySelector<HTMLInputElement>('[data-decorations-toggle]')
   const windowMinimizeButton = document.querySelector<HTMLButtonElement>('[data-window-minimize]')
   const windowCloseButton = document.querySelector<HTMLButtonElement>('[data-window-close]')
+  const ruberangisCircleButton =
+    document.querySelector<HTMLButtonElement>('[data-ruberangis-circle]')
+  const ruberangisGrandButton =
+    document.querySelector<HTMLButtonElement>('[data-ruberangis-grand]')
+  const ruberangisAdjustMinusButton =
+    document.querySelector<HTMLButtonElement>('[data-ruberangis-adjust-minus]')
+  const ruberangisAdjustPlusButton =
+    document.querySelector<HTMLButtonElement>('[data-ruberangis-adjust-plus]')
+  const ruberangisStopButton =
+    document.querySelector<HTMLButtonElement>('[data-ruberangis-stop]')
 
   windowMinimizeButton?.addEventListener('click', async () => {
     await appWindow?.minimize()
@@ -630,9 +1072,100 @@ const bindEvents = () => {
     applyOverlayOpacity()
   })
 
-  voiceToggle?.addEventListener('change', () => {
-    isVoiceEnabled = voiceToggle.checked
-    localStorage.setItem(STORAGE_KEYS.voiceEnabled, String(isVoiceEnabled))
+  fontScaleSlider?.addEventListener('input', () => {
+  combatFontScale = Number(fontScaleSlider.value)
+
+  localStorage.setItem(
+    STORAGE_KEYS.combatFontScale,
+    String(combatFontScale),
+  )
+
+  applyCombatFontScale()
+
+  renderApp()
+})
+
+  ruberangisLeadRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return
+
+      ruberangisLeadSeconds = radio.value === '10' ? 10 : 7
+      localStorage.setItem(
+        STORAGE_KEYS.ruberangisLeadSeconds,
+        String(ruberangisLeadSeconds),
+      )
+      applyRuberangisTimerSettings()
+    })
+  })
+
+  ruberangisNextVoiceToggle?.addEventListener('change', () => {
+    ruberangisPlayNextVoice = ruberangisNextVoiceToggle.checked
+    localStorage.setItem(
+      STORAGE_KEYS.ruberangisPlayNextVoice,
+      String(ruberangisPlayNextVoice),
+    )
+    applyRuberangisTimerSettings()
+  })
+
+  ruberangisMetronomeRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return
+
+      const value = Number(radio.value)
+      ruberangisMetronomeInterval = value === 5 || value === 10 ? value : 0
+      localStorage.setItem(
+        STORAGE_KEYS.ruberangisMetronomeInterval,
+        String(ruberangisMetronomeInterval),
+      )
+      applyRuberangisTimerSettings()
+    })
+  })
+
+  ruberangisVoiceVolumeSlider?.addEventListener('input', () => {
+    ruberangisVoiceVolume = Math.min(
+      100,
+      Math.max(0, Number(ruberangisVoiceVolumeSlider.value)),
+    )
+    localStorage.setItem(
+      STORAGE_KEYS.ruberangisVoiceVolume,
+      String(ruberangisVoiceVolume),
+    )
+    applyRuberangisTimerSettings()
+    renderApp()
+  })
+
+  ruberangisSeVolumeSlider?.addEventListener('input', () => {
+    ruberangisSeVolume = Math.min(
+      100,
+      Math.max(0, Number(ruberangisSeVolumeSlider.value)),
+    )
+    localStorage.setItem(
+      STORAGE_KEYS.ruberangisSeVolume,
+      String(ruberangisSeVolume),
+    )
+    applyRuberangisTimerSettings()
+    renderApp()
+  })
+
+  ruberangisCircleButton?.addEventListener('click', () => {
+    startRuberangisCalamity('circle')
+  })
+
+  ruberangisGrandButton?.addEventListener('click', () => {
+    startRuberangisCalamity('grand')
+  })
+
+  ruberangisAdjustMinusButton?.addEventListener('click', () => {
+    adjustRuberangisTimer(-1)
+  })
+
+  ruberangisAdjustPlusButton?.addEventListener('click', () => {
+    adjustRuberangisTimer(1)
+  })
+
+  ruberangisStopButton?.addEventListener('click', () => {
+    stopRuberangisTimer()
+    renderApp()
   })
 
   settingsOpenButton?.addEventListener('click', () => {
@@ -691,6 +1224,8 @@ const bindEvents = () => {
     if (Number.isNaN(nextIndex)) {
       return
     }
+
+    stopRuberangisTimer()
 
     selectedManifestMonsterIndex = nextIndex
     selectedMonsterIndex = 0
@@ -776,9 +1311,22 @@ const loadRotationData = async () => {
 // アプリ起動時にmanifest読み込みを開始する。
 
 overlayOpacity = getSavedOverlayOpacity()
-isVoiceEnabled = getSavedVoiceEnabled()
+combatFontScale = getSavedCombatFontScale()
+ruberangisLeadSeconds = getSavedRuberangisLeadSeconds()
+ruberangisPlayNextVoice = getSavedRuberangisPlayNextVoice()
+ruberangisMetronomeInterval = getSavedRuberangisMetronomeInterval()
+ruberangisVoiceVolume = getSavedRuberangisVolume(
+  STORAGE_KEYS.ruberangisVoiceVolume,
+  70,
+)
+ruberangisSeVolume = getSavedRuberangisVolume(
+  STORAGE_KEYS.ruberangisSeVolume,
+  85,
+)
 isDecorated = getSavedDecorated()
 
 applyOverlayOpacity()
+applyCombatFontScale()
+applyRuberangisTimerSettings()
 applyDecorations()
 loadRotationData()

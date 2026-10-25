@@ -2,6 +2,9 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #f5f7fb;
   background: #111827;
+
+  /* 戦闘表示部分の文字倍率。main.ts から変更する */
+  --combat-font-scale: 1;
 }
 
 body {
@@ -158,6 +161,38 @@ h1 {
   box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.18);
 }
 
+.phase-tab.phase-hp100_90.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.52);
+}
+
+.phase-tab.phase-hp90_75.active,
+.phase-tab.phase-hp75_50.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.52);
+}
+
+.phase-tab.phase-hp50_25.active {
+  border-color: #facc15;
+  color: #fff7cc;
+  background: rgba(202, 138, 4, 0.48);
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.18);
+}
+
+.phase-tab.phase-hp25_0.active {
+  border-color: #fb7185;
+  color: #ffe4e6;
+  background: rgba(190, 18, 60, 0.48);
+  box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.18);
+}
+
+.phase-tab.phase-unit.active {
+  border-color: #c084fc;
+  color: #f3e8ff;
+  background: rgba(126, 34, 206, 0.48);
+  box-shadow: 0 0 0 2px rgba(192, 132, 252, 0.18);
+}
+
 .controls-block {
   margin-top: 12px;
   padding-top: 10px;
@@ -281,6 +316,35 @@ h1 {
   gap: 10px;
 }
 
+.rotation-list-grid.layout-columns-1 {
+  grid-template-columns: 1fr;
+}
+
+.rotation-list-grid.layout-columns-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rotation-list-grid.layout-columns-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rotation-list-grid.layout-columns-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.rotation-list-grid.layout-columns-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.rotation-list-grid.layout-columns-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.rotation-card.special,
+.rotation-card.span-full {
+  grid-column: 1 / -1;
+}
+
 .rotation-card {
   min-width: 0;
   padding: 12px;
@@ -298,10 +362,6 @@ h1 {
   border-color: #60a5fa;
   background: rgba(37, 99, 235, 0.26);
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.18);
-}
-
-.rotation-card.special {
-  grid-column: 1 / -1;
 }
 
 .rotation-card-header {
@@ -346,11 +406,13 @@ h1 {
   font-size: 13px;
 }
 
-.rotation-card.special .action-list.compact {
+.rotation-card.special .action-list.compact,
+.rotation-card.span-full .action-list.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.rotation-card.special .action-list.compact li {
+.rotation-card.special .action-list.compact li,
+.rotation-card.span-full .action-list.compact li {
   min-width: 0;
 }
 
@@ -376,6 +438,62 @@ h1 {
   overflow-wrap: anywhere;
   word-break: normal;
 }
+
+/* Layout density tuning */
+  .rotation-list-grid.layout-columns-4 {
+    gap: 8px;
+  }
+
+  .rotation-list-grid.layout-columns-4 .rotation-card {
+    padding: 8px;
+  }
+
+  .rotation-list-grid.layout-columns-4 .rotation-card-header {
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+
+  .rotation-list-grid.layout-columns-4 .rotation-card-header h4 {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .rotation-list-grid.layout-columns-4 .tab-id {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    font-size: 10px;
+  }
+
+  .rotation-list-grid.layout-columns-4 .action-list.compact {
+    gap: 4px;
+  }
+
+  .rotation-list-grid.layout-columns-4 .action-list.compact li {
+    grid-template-columns: 22px 1fr;
+    gap: 5px;
+    padding: 5px 6px;
+    font-size: 11.5px;
+    line-height: 1.2;
+  }
+
+  .rotation-list-grid.layout-columns-4 .action-index {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .rotation-list-grid.layout-columns-2 .rotation-card {
+    padding: 10px;
+  }
+
+  .rotation-list-grid.layout-columns-2 .rotation-card-header h4 {
+    font-size: 15px;
+  }
+
+  .rotation-list-grid.layout-columns-2 .action-list.compact li {
+    font-size: 13px;
+  }
 
 /* =========================================================
    Monster select / settings button
@@ -542,10 +660,21 @@ h1 {
   padding: 2px 8px;
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-radius: 999px;
+
   color: #f8fafc;
-  background: rgba(15, 23, 42, var(--overlay-control-bg));
+
+  /* ボス選択欄は透過度設定の影響を受けず、常に暗色で固定 */
+  background: #0f172a;
+  color-scheme: dark;
+
   font-size: 10px;
   cursor: pointer;
+}
+
+/* 開いた候補一覧も暗色固定 */
+.custom-titlebar-select option {
+  color: #f8fafc;
+  background: #0f172a;
 }
 
 .custom-titlebar-icon-button {
@@ -705,6 +834,23 @@ h1 {
   .rotation-list-grid {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .rotation-list-grid.layout-columns-2,
+  .rotation-list-grid.layout-columns-3,
+  .rotation-list-grid.layout-columns-4,
+  .rotation-list-grid.layout-columns-5,
+  .rotation-list-grid.layout-columns-6 {
+    grid-template-columns: 1fr;
+  }
+
+  .rotation-card.span-full {
+    grid-column: auto;
+  }
+
+  .rotation-card.special .action-list.compact,
+  .rotation-card.span-full .action-list.compact {
+    grid-template-columns: 1fr;
   }
 
   .rotation-card {
@@ -868,7 +1014,7 @@ body.overlay .phase-tabs-inline .tab {
   width: auto;
   min-height: 22px;
   padding: 2px 8px;
-  font-size: 10px;
+  font-size: calc(10px * var(--combat-font-scale));
   line-height: 1;
 }
 
@@ -876,6 +1022,34 @@ body.overlay .rotation-list-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+}
+
+body.overlay .rotation-list-grid.layout-columns-1 {
+  grid-template-columns: 1fr;
+}
+
+body.overlay .rotation-list-grid.layout-columns-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.overlay .rotation-list-grid.layout-columns-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.overlay .rotation-list-grid.layout-columns-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+body.overlay .rotation-list-grid.layout-columns-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+body.overlay .rotation-card.span-full {
+  grid-column: 1 / -1;
 }
 
 body.overlay .rotation-card {
@@ -906,11 +1080,44 @@ body.overlay .phase-tab.phase-hp25.active {
   background: rgba(190, 18, 60, var(--overlay-control-active-bg));
 }
 
+body.overlay .phase-tab.phase-hp100_90.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, var(--overlay-control-active-bg));
+}
+
+body.overlay .phase-tab.phase-hp90_75.active,
+body.overlay .phase-tab.phase-hp75_50.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, var(--overlay-control-active-bg));
+}
+
+body.overlay .phase-tab.phase-hp50_25.active {
+  border-color: #facc15;
+  color: #fff7cc;
+  background: rgba(202, 138, 4, var(--overlay-control-active-bg));
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.18);
+}
+
+body.overlay .phase-tab.phase-hp25_0.active {
+  border-color: #fb7185;
+  color: #ffe4e6;
+  background: rgba(190, 18, 60, var(--overlay-control-active-bg));
+  box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.18);
+}
+
+body.overlay .phase-tab.phase-unit.active {
+  border-color: #c084fc;
+  color: #f3e8ff;
+  background: rgba(126, 34, 206, var(--overlay-control-active-bg));
+  box-shadow: 0 0 0 2px rgba(192, 132, 252, 0.18);
+}
+
 body.overlay .rotation-card.special {
   grid-column: 1 / -1;
 }
 
-body.overlay .rotation-card.special .action-list.compact {
+body.overlay .rotation-card.special .action-list.compact,
+body.overlay .rotation-card.span-full .action-list.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -921,7 +1128,7 @@ body.overlay .rotation-card-header {
 }
 
 body.overlay .rotation-card-header h4 {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--combat-font-scale));
   line-height: 1.15;
 }
 
@@ -942,14 +1149,40 @@ body.overlay .action-list.compact li {
   padding: 3px 5px;
   border-radius: 8px;
   background: rgba(15, 23, 42, var(--overlay-row-bg));
-  font-size: 10px;
+  font-size: calc(10px * var(--combat-font-scale));
   line-height: 1.15;
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 {
+  gap: 6px;
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 .rotation-card {
+  padding: 4px;
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 .rotation-card-header h4 {
+  font-size: calc(9.5px * var(--combat-font-scale));
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 .action-list.compact li {
+  grid-template-columns: 16px 1fr;
+  gap: 3px;
+  padding: 3px 4px;
+  font-size: calc(9px * var(--combat-font-scale));
+  line-height: 1.12;
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 .action-index {
+  width: 15px;
+  height: 15px;
+  font-size: calc(7.5px * var(--combat-font-scale));
 }
 
 body.overlay .action-index {
   width: 16px;
   height: 16px;
-  font-size: 8px;
+  font-size: calc(8px * var(--combat-font-scale));
 }
 
 body.overlay .action-text {
@@ -986,7 +1219,255 @@ body.overlay .settings-note {
     grid-column: 1 / -1;
   }
 
-  body.overlay .rotation-card.special .action-list.compact {
+  body.overlay .rotation-card.special .action-list.compact,
+  body.overlay .rotation-card.span-full .action-list.compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* =========================================================
+   Ruberangis timer controls
+   - ルベランギス Lv2 / Lv3 のみ表示
+   - 主操作（サークル / グランド）は大きく
+   - 補正（±0.5秒）は横幅いっぱい
+   - 状態表示 + 停止は最下段
+========================================================= */
+
+.ruberangis-timer-panel {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.ruberangis-timer-main-buttons,
+.ruberangis-timer-adjust-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ruberangis-timer-adjust-buttons {
+  margin-top: 6px;
+}
+
+.ruberangis-timer-button,
+.ruberangis-timer-adjust-button,
+.ruberangis-timer-mini-button {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 9px;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.72);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+/* サークル / グランドは主操作なので縦を大きくする。
+   文字サイズは戦闘文字倍率には連動させない。 */
+.ruberangis-timer-button {
+  min-height: 50px;
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.ruberangis-timer-circle {
+  border-color: rgba(96, 165, 250, 0.72);
+}
+
+.ruberangis-timer-grand {
+  border-color: rgba(250, 204, 21, 0.72);
+}
+
+.ruberangis-timer-button:hover,
+.ruberangis-timer-adjust-button:hover:not(:disabled),
+.ruberangis-timer-mini-button:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.9);
+}
+
+/* ±0.5秒は左右半分ずつ、横幅いっぱいにする */
+.ruberangis-timer-adjust-button {
+  width: 100%;
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+.ruberangis-timer-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.ruberangis-timer-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ruberangis-timer-status.is-running {
+  color: #dbeafe;
+}
+
+.ruberangis-timer-status.is-stopped {
+  color: #64748b;
+  opacity: 0.72;
+}
+
+.ruberangis-timer-mini-button {
+  flex: 0 0 auto;
+  min-height: 24px;
+  padding: 2px 7px;
+  font-size: 10px;
+}
+
+.ruberangis-timer-adjust-button:disabled,
+.ruberangis-timer-mini-button:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.ruberangis-timer-stop {
+  min-width: 42px;
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
+
+/* Tauri overlay */
+body.overlay .ruberangis-timer-panel {
+  margin-top: 6px;
+  padding: 5px;
+  border-color: rgba(96, 165, 250, 0.28);
+  background: rgba(15, 23, 42, var(--overlay-card-bg));
+}
+
+/* 主操作ボタンは文字倍率によらず大きさ固定 */
+body.overlay .ruberangis-timer-button {
+  min-height: 50px;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+body.overlay .ruberangis-timer-adjust-button {
+  min-height: 26px;
+  padding: 2px 6px;
+  font-size: 9px;
+}
+
+body.overlay .ruberangis-timer-status {
+  font-size: calc(9px * var(--combat-font-scale));
+}
+
+body.overlay .ruberangis-timer-mini-button {
+  min-height: 22px;
+  padding: 2px 6px;
+  font-size: 8.5px;
+}
+
+body.overlay .ruberangis-timer-stop {
+  min-width: 42px;
+}
+
+/* 狭い幅でも2列を維持する。
+   カラミティ / 補正ボタンは戦闘中に押しやすい配置を優先。 */
+@media (max-width: 520px) {
+  .ruberangis-timer-main-buttons,
+  .ruberangis-timer-adjust-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ruberangis-timer-status-row {
+    align-items: center;
+    flex-direction: row;
+  }
+}
+
+
+/* =========================================================
+   Ruberangis timer settings
+========================================================= */
+.settings-group {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.settings-group h4 {
+  margin: 0;
+  color: #dbeafe;
+  font-size: 13px;
+}
+
+.settings-choice-row {
+  display: grid;
+  gap: 6px;
+  color: #dbeafe;
+  font-size: 12px;
+}
+
+.settings-choice-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.settings-choice-buttons-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-choice {
+  position: relative;
+}
+
+.settings-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.settings-choice span {
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.62);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.settings-choice input:checked + span {
+  border-color: rgba(96, 165, 250, 0.75);
+  color: #fff;
+  background: rgba(37, 99, 235, 0.42);
+}
+
+body.overlay .settings-group {
+  gap: 8px;
+  padding: 7px;
+}
+
+body.overlay .settings-group h4,
+body.overlay .settings-choice-row {
+  font-size: 10.5px;
+}
+
+body.overlay .settings-choice span {
+  min-height: 24px;
+  padding: 2px 4px;
+  font-size: 9px;
 }

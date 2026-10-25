@@ -1,0 +1,158 @@
+{
+  "version": "2026.05.06",
+  "monsters": [
+    {
+      "id": "frauson_lv2",
+      "name": "フラウソン",
+      "level": "Lv2",
+      "keywords": [
+        { "text": "トライスマッシュ", "style": "strong" },
+        { "text": "黄色の滅閃", "style": "laser" },
+        { "text": "カタストロフ", "style": "earth" },
+        { "text": "マヒャデドス", "style": "ice" },
+        { "text": "連続ドルマドン", "style": "magic" },
+        { "text": "神速メラガイアー", "style": "magic" },
+        { "text": "イオマータ", "style": "magic" },
+        { "text": "いてつく雷鳴", "style": "ice" },
+        { "text": "急襲する吸収", "style": "water" },
+        { "text": "凶絶", "style": "curse" }
+      ],
+      "phases": [
+        {
+          "id": "hp90",
+          "name": "HP90%〜",
+          "patterns": [
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "先兵召喚",
+                "通常攻撃",
+                "トライスマッシュ",
+                "黄色の滅閃",
+                "黄色の災い",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "マヒャデドス" },
+                { "mark": "・", "text": "黄色の災い" },
+                { "mark": "・", "text": "黄色の滅閃" },
+                { "mark": "・", "text": "カタストロフ" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "トライスマッシュ" },
+                { "mark": "・", "text": "連続ドルマドン" },
+                { "mark": "・", "text": "黄色の衝撃" },
+                { "mark": "・", "text": "急襲する吸収（遠タゲ？）" },
+                { "mark": "・", "text": "いてつく雷鳴" },
+                { "mark": "・", "text": "Aモード移行" }
+              ]
+            },
+            {
+              "id": "counter",
+              "name": "反撃",
+              "span": "full",
+              "actions": [
+                { "mark": "反", "text": "カタストロフ" },
+                { "mark": "反", "text": "黄色の災い" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp75",
+          "name": "HP75%〜",
+          "patterns": [
+            {
+              "id": "A",
+              "name": "Aローテ",
+              "actions": [
+                "（初動）凶禍の分与",
+                "先兵召喚",
+                "トライスマッシュ",
+                "黄色の滅閃",
+                "黄色の災い",
+                "Bモード移行"
+              ]
+            },
+            {
+              "id": "B",
+              "name": "Bランダム",
+              "actions": [
+                { "mark": "・", "text": "通常攻撃" },
+                { "mark": "・", "text": "イオマータ" },
+                { "mark": "・", "text": "黄色の衝撃" },
+                { "mark": "・", "text": "黄色の滅閃" },
+                { "mark": "・", "text": "カタストロフ" },
+                { "mark": "・", "text": "Cモード移行" }
+              ]
+            },
+            {
+              "id": "C",
+              "name": "Cランダム",
+              "actions": [
+                { "mark": "・", "text": "神速メラガイアー" },
+                { "mark": "・", "text": "急襲する吸収（遠タゲ？）" },
+                { "mark": "・", "text": "いてつく雷鳴" },
+                { "mark": "・", "text": "凶絶" },
+                { "mark": "・", "text": "黄色の災い" },
+                { "mark": "・", "text": "Aモード移行" }
+              ]
+            },
+            {
+              "id": "counter",
+              "name": "反撃",
+              "span": "full",
+              "actions": [
+                { "mark": "反", "text": "B：カタストロフ / 黄色の災い" },
+                { "mark": "反", "text": "C：叫び / 黄色の災い？" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp60",
+          "name": "HP60%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "固定ローテ",
+              "span": "full",
+              "actions": [
+                "先兵召喚",
+                "トライスマッシュ",
+                "黄色の滅閃",
+                "黄色の災い"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hp50",
+          "name": "HP50%",
+          "patterns": [
+            {
+              "id": "fixed",
+              "name": "初回固定",
+              "span": "full",
+              "actions": [
+                "（最初のみ）先兵召集の号砲",
+                "ランダム"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
