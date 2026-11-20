@@ -95,6 +95,11 @@ const VOICE_PARTS: Record<string, VoicePart> = {
     "kana": "ごびょうまえ",
     "file": "s_5sec"
   },
+  "2_kiiro": {
+    "text": "黄色の床です",
+    "kana": "きいろのゆかです",
+    "file": "2_kiiro"
+  },
   "c_senjo_osoto": {
     "text": "線上・大外です",
     "kana": "せんじょう、おおそとです",
@@ -177,10 +182,10 @@ const LEVELS: Record<RuberangisLevel, LevelConfig> = {
         19150
       ],
       "phases": [
-        {
+                {
           "currentText": "-",
           "noteText": "サークル床",
-          "leadParts": [],
+          "leadParts": ["2_kiiro"],
           "nextParts": []
         }
       ]
@@ -220,8 +225,8 @@ const LEVELS: Record<RuberangisLevel, LevelConfig> = {
         {
           "currentText": "溝（安置）",
           "noteText": "黄色床",
-          "leadParts": [],
-          "nextParts": []
+          "leadParts": ["2_kiiro"],
+          "nextParts": ["s_tsugi", "2_kiiro"]
         }
       ]
     }
