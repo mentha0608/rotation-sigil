@@ -63,7 +63,8 @@ type Pattern = {
   id: string
   name: string
   tag?: string
-  span?: 'full'
+  span?: 'full' | 2
+  actionColumns?: 4
   actions: Action[]
 }
 
@@ -411,6 +412,10 @@ const getPatternSpanClass = (pattern: Pattern, patternIndex: number, phase: Phas
     return ' span-full'
   }
 
+  if (pattern.span === 2) {
+    return ' span-two'
+  }
+
   if (!phase.layout?.columns && (patternIndex >= 3 || pattern.id === 'prison')) {
     return ' span-full'
   }
@@ -510,6 +515,7 @@ const renderApp = () => {
     .map((pattern, patternIndex) => {
       const isActive = patternIndex === selectedPatternIndex ? ' active' : ''
       const spanClass = getPatternSpanClass(pattern, patternIndex, phase)
+      const actionColumnsClass = pattern.actionColumns === 4 ? ' action-columns-4' : ''
 
   const actionsHtml = pattern.actions
     .map((action, actionIndex) => {
@@ -532,7 +538,7 @@ const renderApp = () => {
             <h4>${escapeHtml(pattern.name)}</h4>
           </div>
 
-          <ol class="action-list compact">
+          <ol class="action-list compact${actionColumnsClass}">
             ${actionsHtml}
           </ol>
         </article>

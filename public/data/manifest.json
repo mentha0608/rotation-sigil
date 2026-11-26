@@ -44,6 +44,16 @@
       "id": "ruberangis_lv3",
       "name": "ルベランギス Lv3",
       "path": "data/monsters/ruberangis_lv3.json"
+    },
+    {
+      "id": "shido",
+      "name": "シドー（宿敵）",
+      "path": "data/monsters/shido.json"
+    },
+    {
+      "id": "mildrath",
+      "name": "ミルドラース（宿敵）",
+      "path": "data/monsters/mildrath.json"
     }
   ]
 }

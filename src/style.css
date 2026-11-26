@@ -1471,3 +1471,30 @@ body.overlay .settings-choice span {
   padding: 2px 4px;
   font-size: 9px;
 }
+
+/* Two-column cards and horizontal actions in the rotation list. */
+@media (min-width: 721px) {
+  .rotation-list-grid.layout-columns-4 > .rotation-card.span-two {
+    grid-column: span 2;
+  }
+}
+
+body.overlay .rotation-list-grid.layout-columns-4 > .rotation-card.span-two {
+  grid-column: span 2;
+}
+
+.rotation-card .action-list.compact.action-columns-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.rotation-card .action-columns-4 .action-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 520px) {
+  .rotation-card .action-list.compact.action-columns-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
